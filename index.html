@@ -1,168 +1,27 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&display=swap"
+    rel="stylesheet">
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Random Meme</title>
   <link rel="icon" href="./logo.png">
-  <style>
-  /* Fonts */
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&display=swap');
-
-  /* --- Body / Global --- */
-  body {
-    margin: 0; 
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #2b0000, #400000, #660000); /* Gothic reddish */
-    color: #eee;
-    font-family: "Cinzel", serif;
-    box-sizing: border-box;
-  }
-
-  /* --- Group Header --- */
-  .group-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-
-  .group-logo {
-    width: 80px;
-    border-radius: 50%;
-    border: 3px solid #a100ff;
-    margin-bottom: 10px;
-  }
-
-  .group-name {
-    font-size: 1.2rem;
-    margin: 6px;
-    color: #a100ff;
-    text-shadow: 0 0 8px #ff00ff;
-    font-family: "Cinzel Decorative", cursive;
-  }
-
-  /* --- Cards --- */
-  .card {
-    width: min(900px, 95vw);
-    height: calc(100vh - 48px);
-    background: rgba(20, 20, 20, 0.9); /* dark transparent */
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(161, 0, 255, 0.3);
-    padding: 18px 18px 22px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  h1 {
-    margin: 6px;
-    font-size: 1.2rem;
-    color: #850101;
-    text-shadow: 0 0 6px #ff00ff;
-  }
-
-  #viewer {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  #status {
-    color: #ccc;
-    font-size: 0.95rem;
-    margin: 0 8px;
-    min-height: 1.2em;
-  }
-
-  #meme {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    object-fit: contain;
-    flex: 1;
-    min-height: 200px;
-    text-align: center;
-    font-size: 1.5rem;
-    color: #ccc;
-    line-height: 1.5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  #meme[hidden] {
-    background: #333;
-  }
-
-  #caption {
-    margin: 0 8px;
-    font-weight: 400;
-    color: #eee;
-    text-shadow: 0 0 4px #000;
-  }
-
-  .actions {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-  }
-
-  button {
-    border: 0;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    background: #a100ff;
-    color: white;
-    box-shadow: 0 0 10px #ff00ff;
-    transition: 0.2s;
-  }
-
-  button:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px #ff00ff;
-  }
-
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .footer {
-    text-align: center;
-    color: #888;
-    font-size: 0.85rem;
-    margin-top: 8px;
-  }
-</style>
-
-  
-  
+  <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
   <main class="card">
     <div class="group-header">
-  <img src="./logo.png" alt="Group Logo" class="group-logo">
-  <h2 class="group-name">Goth Baddies &amp; Fine Shyt</h2>
-</div>
-
+      <img src="./logo.png" alt="Group Logo" class="group-logo">
+      <h2 class="group-name">Goth Baddies &amp; Fine Shyt</h2>
+    </div>
 
     <h1>Random Meme</h1>
-    
+
     <div id="viewer">
       <div id="status">Click "Next Meme" to load one.</div>
       <img id="meme" alt="Meme will appear here" hidden>
@@ -174,56 +33,7 @@
     <div class="footer">Powered by meme-api.com</div>
   </main>
 
-  <script>
-    const btn = document.getElementById('nextBtn');
-    const img = document.getElementById('meme');
-    const caption = document.getElementById('caption');
-    const statusEl = document.getElementById('status');
-
-    async function loadMeme() {
-      try {
-        // UI: loading state
-        btn.disabled = true;
-        statusEl.textContent = 'Loading…';
-        img.hidden = true;
-        caption.hidden = true;
-
-        // Fetch a random meme
-        const res = await fetch('https://meme-api.com/gimme', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Network error');
-        const data = await res.json();
-
-        // Some responses may be nested; ensure fields exist
-        const imageUrl = data.url;
-        const title = data.title || 'Random Meme';
-
-        // Preload image before showing
-        const preload = new Image();
-        preload.onload = () => {
-          img.src = imageUrl;
-          img.alt = title;
-          caption.textContent = title;
-
-          statusEl.textContent = '';
-          img.hidden = false;
-          caption.hidden = false;
-          btn.disabled = false;
-        };
-        preload.onerror = () => {
-          throw new Error('Image failed to load');
-        };
-        preload.referrerPolicy = 'no-referrer'; // avoids some hotlink issues
-        preload.src = imageUrl;
-
-      } catch (e) {
-        statusEl.textContent = 'Could not load meme. Click again.';
-        btn.disabled = false;
-      }
-    }
-
-    // First meme on page load + next button
-    document.addEventListener('DOMContentLoaded', loadMeme);
-    btn.addEventListener('click', loadMeme);
-  </script>
+  <script src="script.js"></script>
 </body>
+
 </html>
